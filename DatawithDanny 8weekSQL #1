@@ -1,0 +1,6 @@
+What is the total amount each customer spent at the restaurant?
+select ds.customer_id, sum(dm.price) from dannys_diner.sales as ds
+inner join dannys_diner.menu as dm 
+on ds.product_id = dm.product_id
+group by ds.customer_id
+order by ds.customer_id
