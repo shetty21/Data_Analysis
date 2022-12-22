@@ -1,1 +1,84 @@
+Part A. Pizza Metrics
+--1. How many pizzas were ordered?
+
+select count(*) from pizza_runner.customer_orders
+
+--2. How many unique customer orders were made?
+
+select count(Distinct order_id) from pizza_runner.customer_orders
+
+--3. How many successful orders were delivered by each runner?
+
+select runner_id, count(*) as successful_orders from pizza_runner.runner_orders
+where pickup_time != 'null'
+group by runner_id
+order by runner_id
+
+--4. How many of each type of pizza was delivered?
+
+select pn.pizza_name, count(*) from pizza_runner.runner_orders as pr
+inner join pizza_runner.customer_orders as pc
+on pr.order_id = pc.order_id
+inner join pizza_runner.pizza_names as pn
+on pc.pizza_id = pn.pizza_id
+where pr.pickup_time != 'null'
+group by pn.pizza_name
+
+--5. How many Vegetarian and Meatlovers were ordered by each customer?
+
+select customer_id,
+sum(case when pizza_id = 1 then 1 else 0 end) as Vegetarian,
+sum(case when pizza_id = 2 then 1 else 0 end) as Meatlovers
+from pizza_runner.customer_orders
+group by customer_id
+order by customer_id
+
+--6. What was the maximum number of pizzas delivered in a single order?
+
+select order_id,count(*) as number_pizzas
+from pizza_runner.customer_orders
+group by order_id
+order by number_pizzas desc
+limit 1
+
+--7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
+
+select pc.customer_id,
+sum(case when (pc.extras = '' or pc.extras = 'null' or pc.extras is null) and (pc.exclusions = '' or pc.exclusions = 'null' or pc.exclusions is null) then 0 else 1 end) as at_least_one_change,
+sum(case when (pc.extras = '' or pc.extras = 'null' or pc.extras is null) and (pc.exclusions = '' or pc.exclusions = 'null' or pc.exclusions is null) then 1 else 0 end) as no_change
+from pizza_runner.customer_orders as pc
+inner join pizza_runner.runner_orders as pr
+on pr.order_id = pc.order_id
+where pr.pickup_time != 'null'
+group by customer_id
+order by customer_id
+
+--8. How many pizzas were delivered that had both exclusions and extras?
+
+WITH cte_cleaned_customer_orders AS (
+  SELECT
+    order_id,
+    customer_id,
+    pizza_id,
+    CASE WHEN exclusions IN ('null', '') THEN NULL else 1 END AS exclusions,
+    CASE WHEN extras IN ('null', '') THEN NULL else 1 END AS extras,
+    order_time
+  FROM pizza_runner.customer_orders
+)
+SELECT
+count(*)
+FROM cte_cleaned_customer_orders
+WHERE exclusions IS NOT NULL and extras IS NOT NULL
+
+--9. What was the total volume of pizzas ordered for each hour of the day?
+
+select DATE_PART('hour', order_time::TIMESTAMP) AS hour_of_day, count(*) from pizza_runner.customer_orders
+group by hour_of_day
+order by hour_of_day
+
+--10. What was the volume of orders for each day of the week?
+
+select To_char(order_time,'Day') AS Day, count(*) from pizza_runner.customer_orders
+group by Day
+
 
