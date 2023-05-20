@@ -1,1 +1,83 @@
+Schema SQL - https://www.db-fiddle.com/f/jmnwogTsUE8hGqkZv9H7E8/17
 
+Digital Analysis:
+1. How many users are there?
+
+SELECT count(Distinct user_id) as users FROM clique_bait.users;
+
+2. How many cookies does each user have on average?
+
+With i as (SELECT Distinct user_id, count(cookie_id) as cookie_count FROM clique_bait.users
+group by user_id
+order by user_id)
+
+Select round(avg(cookie_count),2) as aerage_count from i;
+
+3. What is the unique number of visits by all users per month?
+
+Select To_char(e.event_time, 'Month') as Month, count(Distinct e.visit_id) FROM clique_bait.events as e
+inner join clique_bait.users as u
+on u.cookie_id = e.cookie_id
+group by Month
+order by Month;
+
+4. What is the number of events for each event type?
+
+Select e.event_type, ei.event_name, count(*) from clique_bait.events as e
+inner join clique_bait.event_identifier as ei
+on e.event_type = ei.event_type
+group by e.event_type, ei.event_name
+order by e.event_type;
+
+5. What is the percentage of visits which have a purchase event?
+
+WITH cte_visits_with_purchase_flag AS (
+  SELECT
+    visit_id,
+    Sum(CASE WHEN event_type = 3 THEN 1 ELSE 0 END) AS purchase_flag
+  FROM clique_bait.events
+  GROUP BY visit_id
+)
+SELECT
+  ROUND(100 * SUM(purchase_flag) / COUNT(*), 2) AS purchase_percentage
+FROM cte_visits_with_purchase_flag;
+
+6. What is the percentage of visits which view the checkout page but do not have a purchase event?
+
+WITH i AS (
+  SELECT
+    visit_id,
+    Sum(CASE WHEN event_type = 1 and page_id = 12 THEN 1 ELSE 0 END) AS view_flag,
+  Sum(CASE WHEN event_type = 3 THEN 1 ELSE 0 END) AS purchase_flag
+  FROM clique_bait.events
+  GROUP BY visit_id
+)
+
+SELECT
+  ROUND(100 * SUM(CASE WHEN purchase_flag = 0 THEN 1 ELSE 0 END)::NUMERIC / COUNT(*), 2) AS checkout_without_purchase_percentage
+FROM i
+WHERE view_flag != 0;
+
+7. What are the top 3 pages by number of views?
+
+SELECT p.page_name, sum(case when e.event_type = 1 then 1 else 0 end) as page_views 
+FROM clique_bait.events as e
+inner join clique_bait.event_identifier  as ei
+on e.event_type = ei.event_type
+inner join clique_bait.page_hierarchy  as p
+on p.page_id = e.page_id
+group by p.page_name
+order by page_views desc
+Limit 3
+
+8. What is the number of views and cart adds for each product category?
+
+SELECT p.product_category, sum(case when e.event_type = 1 then 1 else 0 end) as page_views, sum(case when e.event_type = 2 then 1 else 0 end) as cart_adds
+FROM clique_bait.events as e
+inner join clique_bait.event_identifier  as ei
+on e.event_type = ei.event_type
+inner join clique_bait.page_hierarchy  as p
+on p.page_id = e.page_id
+where p.product_category is not null
+group by p.product_category
+order by page_views desc
