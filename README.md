@@ -1,15 +1,12 @@
 # 8 Week SQL Challenge — Case Studies
 
-SQL case studies completed from [Danny Ma's 8 Week SQL Challenge](https://8weeksqlchallenge.com/getting-started/). Each project focuses on translating a business question into clear, reproducible PostgreSQL analysis.
+An SQL case study completed from [Danny Ma's 8 Week SQL Challenge](https://8weeksqlchallenge.com/getting-started/). The project focuses on translating business questions into clear, reproducible PostgreSQL analysis.
 
 ## Completed work
 
 | Case study | Focus | Skills demonstrated | Link |
 | --- | --- | --- | --- |
 | 1. Danny's Diner | Customer behavior and loyalty-program analysis | Joins, CTEs, window functions, aggregation, conditional logic | [View case study](case-studies/01-dannys-diner/) |
-| 2. Pizza Runner | Pizza metrics and customer-order analysis | Data cleaning, aggregation, conditional logic | [View SQL](DatawithDanny8weekSQL%232) |
-| 7. Balanced Tree Clothing Co. | Sales, transaction, and product analysis | Percentiles, revenue analysis, ranking | [View SQL](DatawithDanny8weekSQL%237) |
-| 8. Fresh Segments / Clique Bait | Digital analytics | Event analysis, funnel metrics, joins | [View SQL](DatawithDanny8weekSQL%238) |
 
 ## About this repository
 

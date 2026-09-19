@@ -54,7 +54,6 @@ The SQL uses the original `dannys_diner` schema names. If your tables are in a d
 ## Files
 
 - [solutions.sql](solutions.sql) — documented, runnable solutions for all 12 questions
-- [Original working notes](../../DatawithDanny%208weekSQL%20%231) — the initial completed solution file
 
 ## Source
 
